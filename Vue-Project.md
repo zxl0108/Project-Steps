@@ -7,7 +7,7 @@
 > 在命令行中输入以下命令创建 Vue 项目：
 
 ```js
-vue create topline-webapp
+vue create 项目名称
 ```
 
 ```js
@@ -159,16 +159,11 @@ Vue CLI v3.11.0
 
 ```
 import Vue from 'vue'
-import VueRouter from 'vue-router'
-
-Vue.use(VueRouter)
-
-const router = new VueRouter({
-  // 配置路由表
+import Router from 'vue-router'
+Vue.use(Router)
+export default new Router({
   routes: []
 })
-
-export default router
 ```
 
 > 路由懒加载
