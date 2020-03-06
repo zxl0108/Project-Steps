@@ -963,8 +963,9 @@ for(let i = 0; i < 10; i ++) { // 可自定义生成的个数
   }
   data.push(template)
 }
-Mock.mock('/list',data) //根据数据模板生成模拟数据
-Mock.mock('/list/add','POST',data)
+//注意:get,post要为小写方可生效!!!
+Mock.mock('/list','get',data) //根据数据模板生成模拟数据
+Mock.mock('/list/add','post',data)
 ```
 
 ###### 4.设置axios发送POST请求头及拦截器
