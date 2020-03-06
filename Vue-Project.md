@@ -851,4 +851,160 @@ Vue.filter('relativeTime', value => {
 </keep-alive>
 ```
 
-匹配首先检查组件自身的 `name` 选项，如果 `name` 选项不可用，则匹配它的局部注册名称 (父组件 `components` 选项的键值)。匿名组件不能被匹配。
+- 匹配首先检查组件自身的 `name` 选项，如果 `name` 选项不可用，则匹配它的局部注册名称 (父组件 `components` 选项的键值)。匿名组件不能被匹配。
+
+## Json-Serve 与 Mock 模拟数据
+
+### Json-serve模拟数据
+
+#### 1.安装json-server
+
+```js
+npm install -g json-server
+```
+
+#### 2.启动 json-server
+
+###### 1.创建db.json
+
+```js
+// info,comments 相等于 我们数据库中的一个表
+// 注意生成数据要有id
+{
+  "info": [
+    {
+      "id": 1,
+      "name": "张三",
+      "age": "18",
+      "author": "小张"
+    }
+  ],
+  "comments": [
+    {
+      "id": 1,
+      "body": "some comment",
+      "postId": 1
+    }
+  ],
+}
+```
+
+###### 2.启动json-server
+
+```js
+json-server --watch db.json	//用来访问接口；
+```
+
+###### 3.发送ajax请求
+
+```js
+//1.设置json-server服务(利用axios协助发送请求,创建request请求)
+import axios from 'axios'
+const request = axios.create({
+  baseURL: 'http://localhost:3000'
+})
+export default request
+//2.创建api模块(get,post,delete,put)
+import request from '@/untils/request'
+// 获取数据资料
+export const getInfo = () => {
+  return request({
+    method: 'get',
+    url: '/info'
+  })
+}
+//3.发送请求
+import { getInfo } from '@/api/getData'
+ async getData () {
+      const res = await getInfo()
+      console.log(res)
+      this.list = res.data
+    },
+```
+
+### Mock 模拟随机数据
+
+```
+Mock官网地址:http://mockjs.com
+```
+
+###### 1.安装Mockjs
+
+```
+npm install mockjs --save
+```
+
+###### 2.创建mock.js，并在main.js引入mock.js
+
+```
+require('./untils/mock.js')
+```
+
+###### 3.在mock.js下生成mock随机数据
+
+```js
+import Mock from 'mockjs' // 引入mockjs
+const Random = Mock.Random // Mock.Random 是一个工具类，用于生成各种随机数据
+
+let data = [] // 用于接受生成数据的数组
+// 定义随机值(详情请查看文档)
+for(let i = 0; i < 10; i ++) { // 可自定义生成的个数
+  let template = {
+    'Boolean': Random.boolean, // 可以生成基本数据类型
+    'Natural': Random.natural(1, 10), // 生成1到100之间自然数
+    'Character': Random.character(), // 生成随机字符串,可加参数定义规则
+    'String': Random.string(2, 10), // 生成2到10个字符之间的字符串
+    'Range': Random.range(0, 10, 2), // 生成一个随机数组
+    'Date': Random.date(), // 生成一个随机日期,可加参数定义日期格式
+    'Color': Random.color(), // 生成一个颜色随机值
+    'Name': Random.name(), // 生成姓名
+    'Url': Random.url(), // 生成web地址
+    'Address': Random.province() // 生成地址
+  }
+  data.push(template)
+}
+Mock.mock('/list',data) //根据数据模板生成模拟数据
+Mock.mock('/list/add','POST',data)
+```
+
+###### 4.设置axios发送POST请求头及拦截器
+
+```js
+import axios from 'axios'
+axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
+// 请求拦截器
+axios.interceptors.request.use(function(config) {
+    return config;
+  }, function(error) {
+    return Promise.reject(error);
+  })
+// 响应拦截器
+axios.interceptors.response.use(function(response) {
+  return response;
+}, function(error) {
+  return Promise.reject(error);
+export default axios
+```
+
+###### 5.创建api请求模块
+
+```js
+import request from '@/untils/request'
+export const getList = () => {
+    return request({
+        method: 'GET',
+        url: '/list'
+    })
+}
+```
+
+###### 6.发送ajax请求，mock拦截请求
+
+```js
+import {getList} from '@/api/getData' 
+async  getData() {
+    const res=await getList()
+    console.log(res);
+        }
+```
+
